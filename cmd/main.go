@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "auth-service/docs"
 	"auth-service/internal/config"
 	"auth-service/internal/handler"
 	"auth-service/internal/service"
@@ -12,10 +13,18 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Auth Service API
+// @version 1.0
+// @description Authentication service with JWT tokens
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
-
 	cfg := config.NewConfig()
 
 	connStr := cfg.ConnectionString
@@ -35,6 +44,8 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	e.POST("/auth/token", authHandler.GetTokens)
 	e.POST("/auth/token/refresh", authHandler.RefreshTokens)
